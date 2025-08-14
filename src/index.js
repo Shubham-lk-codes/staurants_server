@@ -5,6 +5,10 @@ import mongoose from 'mongoose'
 import { Server as SocketIOServer } from 'socket.io'
 import { buildRouter } from './routes.js'
 
+import dotenv from "dotenv";
+dotenv.config();
+
+
 const app = express()
 const server = http.createServer(app)
 const io = new SocketIOServer(server, {
@@ -14,7 +18,7 @@ const io = new SocketIOServer(server, {
 app.use(cors({ origin: '*'}))
 app.use(express.json())
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/restaurant'
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://shubhamlonkar137:Uu7tA4lA44RAhcJJ@cluster0.4usdxpx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 const PORT = process.env.PORT || 5000
 
 mongoose.connect(MONGO_URI).then(() => {

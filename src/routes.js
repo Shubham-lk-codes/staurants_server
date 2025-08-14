@@ -3,11 +3,19 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import QRCode from 'qrcode'
+import Razorpay from 'razorpay'
+import crypto from 'crypto'
 import { User, Table, MenuItem, Order } from './models.js'
 
 export function buildRouter(io) {
   const router = express.Router()
   const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret'
+
+  // Initialize Razorpay (ensure env vars are set)
+  const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID || '',
+    key_secret: process.env.RAZORPAY_KEY_SECRET || ''
+  })
 
   // Auth
   router.post('/auth/login', async (req, res) => {
@@ -103,7 +111,55 @@ export function buildRouter(io) {
     res.json({ dataUrl, url })
   })
 
+  // Step 1: Create payment order
+  router.post('/orders/:id/pay', async (req, res) => {
+    try {
+      const orderDoc = await Order.findById(req.params.id)
+      if (!orderDoc) return res.status(404).json({ message: 'Order not found' })
+
+      const options = {
+        amount: Math.round(orderDoc.totalAmount * 100), // in paise
+        currency: 'INR',
+        receipt: `order_rcpt_${orderDoc._id}`,
+        payment_capture: 1
+      }
+
+      const paymentOrder = await razorpay.orders.create(options)
+      res.json({
+        key: process.env.RAZORPAY_KEY_ID,
+        amount: paymentOrder.amount,
+        currency: paymentOrder.currency,
+        orderId: paymentOrder.id
+      })
+    } catch (err) {
+      console.error(err)
+      res.status(500).json({ message: 'Failed to create payment' })
+    }
+  })
+
+  // Step 2: Verify payment
+  router.post('/payments/verify', async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body
+    try {
+      const sign = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '')
+        .update(razorpay_order_id + '|' + razorpay_payment_id)
+        .digest('hex')
+
+      if (sign === razorpay_signature) {
+        // Update order status
+        await Order.findByIdAndUpdate(orderId, { status: 'paid' })
+        io.emit('order:update', { _id: orderId, status: 'paid' })
+        res.json({ success: true })
+      } else {
+        res.status(400).json({ success: false, message: 'Invalid signature' })
+      }
+    } catch (err) {
+      console.error(err)
+      res.status(500).json({ success: false })
+    }
+  })
+
+
   return router
 }
-
-
