@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
 import { User, Table, MenuItem } from './models.js'
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/restaurant'
+const MONGO_URI = process.env.MONGO_URI ||  'mongodb+srv://shubhamlonkar137:Uu7tA4lA44RAhcJJ@cluster0.4usdxpx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
 async function run() {
   await mongoose.connect(MONGO_URI)

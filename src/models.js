@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { v4 as uuidv4 } from 'uuid'
 
 const UserSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
@@ -7,8 +8,8 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 const TableSchema = new mongoose.Schema({
-  number: { type: String, required: true, unique: true },
-  token: { type: String, required: true, unique: true },
+  number: { type: Number, required: true },
+  token: { type: String, unique: true, default: uuidv4 },
   isActive: { type: Boolean, default: true }
 }, { timestamps: true })
 

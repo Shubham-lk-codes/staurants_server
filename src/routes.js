@@ -103,13 +103,26 @@ export function buildRouter(io) {
     res.status(201).json(table)
   })
 
-  router.get('/admin/tables/:id/qr', requireAuth, async (req, res) => {
-    const table = await Table.findById(req.params.id)
-    if (!table) return res.status(404).json({ message: 'Not found' })
-    const url = `${process.env.PUBLIC_APP_URL || 'http://localhost:5173'}/menu?table=${table.token}`
-    const dataUrl = await QRCode.toDataURL(url)
-    res.json({ dataUrl, url })
-  })
+  // Admin: get all tables
+router.get('/admin/tables', requireAuth, async (req, res) => {
+  try {
+    const tables = await Table.find().lean()
+    res.json(tables)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Failed to fetch tables' })
+  }
+})
+
+
+router.get('/admin/tables/:id/qr', requireAuth, async (req, res) => {
+  const table = await Table.findById(req.params.id)
+  if (!table) return res.status(404).json({ message: 'Not found' })
+  const url = `${process.env.PUBLIC_APP_URL || 'http://localhost:5173'}/menu?tableToken=${table.token}`
+  const dataUrl = await QRCode.toDataURL(url)
+  res.json({ dataUrl, url })
+})
+
 
   // Step 1: Create payment order
   router.post('/orders/:id/pay', async (req, res) => {
