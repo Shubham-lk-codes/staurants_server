@@ -14,14 +14,17 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
+    "multer": "^2.0.2",
     "qrcode": "^1.5.4",
     "razorpay": "^2.9.6",
     "socket.io": "^4.8.1",
+    "streamifier": "^0.1.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
