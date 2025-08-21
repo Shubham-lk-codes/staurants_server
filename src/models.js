@@ -17,7 +17,7 @@ const MenuItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
   imageUrl: String,
-  category: { type: String, enum: ['Starters', 'Main Course', 'Drinks', 'Desserts'], index: true },
+  category: { type: String, enum: ['Tea', 'Coffee', 'Shake', 'Frezzers','Pasta','Sandwich','Maggi','Burger','Pizza','Quick Bites'], index: true },
   price: { type: Number, required: true },
   isAvailable: { type: Boolean, default: true },
   prepMinutes: { type: Number, default: 15 }

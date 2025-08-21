@@ -65,41 +65,6 @@ router.get('/menu/all', async (req, res) => {
   }
 });
 
-// router.post("/menu", upload.single("image"), async (req, res) => {
-//   try {
-//     let imageUrl = "";
-
-//     if (req.file) {
-//       const uploadResult = await cloudinary.uploader.upload_stream(
-//         { folder: "menu_items" },
-//         (error, result) => {
-//           if (error) throw error;
-//           imageUrl = result.secure_url;
-//         }
-//       );
-//       uploadResult.end(req.file.buffer);
-//     }
-
-//     const menuItem = new MenuItem({
-//       name: req.body.name,
-//       description: req.body.description,
-//       imageUrl,
-//       category: req.body.category,
-//       price: req.body.price,
-//       isAvailable: req.body.isAvailable,
-//       prepMinutes: req.body.prepMinutes
-//     });
-
-//     await menuItem.save();
-//     res.status(201).json(menuItem);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Error creating menu item" });
-//   }
-// });
-
-// ✅ Update Menu Item
-// Update menu item with optional image
 
 router.post("/menu", upload.single("image"), async (req, res) => {
   try {
