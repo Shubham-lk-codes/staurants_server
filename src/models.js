@@ -28,13 +28,28 @@ const OrderItemSchema = new mongoose.Schema({
   quantity: { type: Number, required: true, min: 1 }
 }, { _id: false })
 
+// const OrderSchema = new mongoose.Schema({
+//   table: { type: mongoose.Schema.Types.ObjectId, ref: 'Table', required: true },
+//   items: [OrderItemSchema],
+//   status: { type: String, enum: ['pending', 'preparing', 'ready', 'served', 'paid'], default: 'pending', index: true },
+//   totalAmount: { type: Number, default: 0 },
+//   paid: { type: Boolean, default: false }
+// }, { timestamps: true })
+
 const OrderSchema = new mongoose.Schema({
   table: { type: mongoose.Schema.Types.ObjectId, ref: 'Table', required: true },
   items: [OrderItemSchema],
-  status: { type: String, enum: ['pending', 'preparing', 'ready', 'served', 'paid'], default: 'pending', index: true },
+  status: { 
+    type: String, 
+    enum: ['pending', 'preparing', 'ready', 'served', 'paid'], 
+    default: 'pending', 
+    index: true 
+  },
   totalAmount: { type: Number, default: 0 },
-  paid: { type: Boolean, default: false }
+  paid: { type: Boolean, default: false },
+  paymentMethod: { type: String, enum: ['online', 'cod'], default: 'cod' }  // ✅ added
 }, { timestamps: true })
+
 
 export const User = mongoose.model('User', UserSchema)
 export const Table = mongoose.model('Table', TableSchema)

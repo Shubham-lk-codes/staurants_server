@@ -189,6 +189,60 @@ router.delete("/menu/:id", async (req, res) => {
     }
   })
 
+  
+  // ✅ Create COD (Offline) Order
+router.post('/orders/cod', async (req, res) => {
+  try {
+    const { tableId, ordered_items } = req.body;
+
+    // 1. Table check
+    const table = await Table.findById(tableId);
+    if (!table) return res.status(400).json({ message: 'Invalid table' });
+
+    // 2. Items fetch karo
+    const itemIds = ordered_items.map(o => o.itemId);
+    const menuItems = await MenuItem.find({ _id: { $in: itemIds } });
+    const idToItem = new Map(menuItems.map(m => [String(m._id), m]));
+
+    // 3. Order items structure
+    const items = ordered_items.map(o => ({
+      item: o.itemId,
+      quantity: o.quantity,
+    }));
+
+    // 4. Total amount calculate
+    const totalAmount = ordered_items.reduce(
+      (sum, o) =>
+        sum + (idToItem.get(String(o.itemId))?.price || 0) * o.quantity,
+      0
+    );
+
+    // 5. Create order with COD flag
+    const order = await Order.create({
+      table: table._id,
+      items,
+      totalAmount,
+      status: 'pending',
+      paymentMethod: 'COD',   // ✅ ye add kiya hai
+    });
+
+    // 6. Populate karo
+    const populated = await order
+      .populate({ path: 'items.item' })
+      .then(o => o.populate('table'));
+
+    // 7. Real-time emit
+    io.emit('order:new', populated);
+
+    // 8. Response
+    res.status(201).json(populated);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: 'Failed to create COD order' });
+  }
+});
+
+
   // Get Orders (with optional served/paid)
   router.get('/orders', requireAuth, async (req, res) => {
     try {
