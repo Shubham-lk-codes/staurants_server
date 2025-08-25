@@ -193,10 +193,10 @@ router.delete("/menu/:id", async (req, res) => {
   // ✅ Create COD (Offline) Order
 router.post('/orders/cod', async (req, res) => {
   try {
-    const { tableId, ordered_items } = req.body;
+    const { tableToken, ordered_items } = req.body;
 
-    // 1. Table check
-    const table = await Table.findById(tableId);
+    // 1. Table check (by _id)
+    const table = await Table.findById(tableToken);
     if (!table) return res.status(400).json({ message: 'Invalid table' });
 
     // 2. Items fetch karo
@@ -223,7 +223,7 @@ router.post('/orders/cod', async (req, res) => {
       items,
       totalAmount,
       status: 'pending',
-      paymentMethod: 'COD',   // ✅ ye add kiya hai
+      paymentMethod: 'cod',   // ✅ lowercase fix
     });
 
     // 6. Populate karo
@@ -241,6 +241,7 @@ router.post('/orders/cod', async (req, res) => {
     res.status(500).json({ message: 'Failed to create COD order' });
   }
 });
+
 
 
   // Get Orders (with optional served/paid)
